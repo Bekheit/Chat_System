@@ -32,6 +32,8 @@ gem 'rack-cors'
 gem 'jwt'
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
+gem 'bunny'
+gem 'sneakers'
 
 # Use ActiveStorage variant
 # gem 'mini_magick', '~> 4.8'

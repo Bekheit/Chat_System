@@ -2,27 +2,38 @@ module Api
     class UsersController < ApplicationController
         before_action :authorized, only: [:auto_login]
 
+        # require 'bunny'
+  
+        # connection = Bunny.new
+        # connection.start
+
+        # channel = connection.create_channel
+
+        # queue = channel.queue('users')
+
+        
         def index
-            users = User.all;
-            users = users.map {|user| user.attributes.except('id')}
-             
-            render json:{users: users}
+          users = User.all;
+          users = users.map {|user| user.attributes.except('id')}
+          
+          render json:{users: users}
         end
-
+        
         def show
-            user = User.find_by(username: params[:id])
-            if user
-              render json:{user: user}
-            else
-              render json:{message: 'User Not Found'}
-            end
+          user = User.find_by(username: params[:id])
+          if user
+            render json:{user: user}
+          else
+            render json:{message: 'User Not Found'}
+          end
         end
-
+        
         def create
           if username_exist(params[:username])
             return render json:{message: 'Username is already exist'}
           end
           user = User.new(user_params)
+          
           if user.save
               render json: {user: user.attributes.except('id')}
           else
@@ -55,9 +66,12 @@ module Api
             user = User.find_by(username: params[:username])
 
             if user && user.authenticate(params[:password])
-                Current.user = user
-                token = encode_token({user_id: user.id})
-                render json: {user: user.attributes.except('id'), token: token}
+              # channel.default_exchange.publish("Hello #{user.username} !", routing_key: queue.name)
+              pub = MassUpdatePublisher.new(user.username)
+              pub.publish
+              Current.user = user
+              token = encode_token({user_id: user.id})
+              render json: {user: user.attributes.except('id'), token: token}
             else
                 render json: {error: "Invalid username or password"}
             end
@@ -68,6 +82,7 @@ module Api
             render json: user
         end
 
+        # connection.close
 
         private
 
@@ -78,6 +93,7 @@ module Api
         def username_exist(username)
           user = User.find_by(username: username)
         end
+
 
     end
 end
