@@ -17,6 +17,9 @@ module Api
         end
 
         def create
+          if application_name_exist(params[:name])
+            return render json:{message: 'Application name is already exist'}
+          end
             application = Application.new(application_params)
             application.token = encode_token({name: application.name})
             if application.save
@@ -37,10 +40,11 @@ module Api
 
         def update
           application = Application.find_by(name: params[:id])
-          if application.update({name: params[:name]})
+          application.name = params[:name]
+          if application.save
             render json:{message: 'Application Updated Successfully'}
           elsif 
-            render json:{message: 'Failed to update application'}
+            render json:{message: application.errors}
           end
         end
 
@@ -48,6 +52,10 @@ module Api
 
         def application_params
             params.permit(:name)
+        end
+
+        def application_name_exist(name)
+          application = Application.find_by(name: name)
         end
     end
 end

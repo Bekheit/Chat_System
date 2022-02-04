@@ -4,15 +4,13 @@ module Api
     $application
       
     def index
-      p '---------------------------------chats index---------------------------------'
         chats = Chat.where(application_id: $application.id)
         chats = chats.map {|chat| chat.attributes.except('id')}
         render json:{chats: chats}
     end
 
     def show
-        application = Application.find_by(name: application_decoded_token[0]['name'])
-        chat = chat.find_by(number: params[:chat_no], application_id: application.id)
+        chat = Chat.find_by(number: params[:chat_no], application_id: $application.id)
         if chat
           render json:{chat: chat.attributes.except('id')}
         elsif 
@@ -21,13 +19,12 @@ module Api
     end
 
     def create
-      application = Application.find_by(name: application_decoded_token[0]['name'])
-      chat = application.chats.new({number: application.chats_created + 1})
+      chat = $application.chats.new({number: $application.chats_created + 1})
       if chat.save
           render json:{number: chat.number}
-          application.update({
-              chats_count: application.chats_count + 1,
-              chats_created: application.chats_created + 1
+          $application.update({
+              chats_count: $application.chats_count + 1,
+              chats_created: $application.chats_created + 1
           })
       else
           render json:{message: 'Error'}
@@ -35,10 +32,9 @@ module Api
     end
 
     def destroy
-        application = Application.find_by(name: application_decoded_token[0]['name'])
-        chat = chat.find_by(number: params[:chat_no], application_id: application.id)
+        chat = Chat.find_by(number: params[:chat_no], application_id: $application.id)
         if chat.destroy
-          application.update({chats_count: application.chats_count - 1})
+          $application.update({chats_count: $application.chats_count - 1})
           render json:{message: 'Chat deleted'}
         elsif 
           render json:{message: 'Failed to delete chat'}
@@ -46,18 +42,15 @@ module Api
     end
 
     def update
-        application = Application.find_by(name: application_decoded_token[0]['name'])
-        chat = chat.find_by(number: params[:chat_no], application_id: application.id)
+        chat = Chat.find_by(number: params[:chat_no], application_id: $application.id)
     end
 
     def application_decoded_token
         token = params[:app_token]
-        token = token.gsub("-", ".")
+        token = token.gsub("@", ".")
         begin
-          p token
           JWT.decode(token, ENV["TokenSecret"], true, algorithm: 'HS256')
         rescue JWT::DecodeError
-          p '------------------------------------ Decode app Token error ------------------------------------'
           nil
         end
     end

@@ -20,7 +20,7 @@ module Api
         end
         
         def show
-          user = User.find_by(username: params[:id])
+          user = User.find_by(username: params[:username])
           if user
             render json:{user: user}
           else
@@ -41,7 +41,7 @@ module Api
         end
 
         def destroy
-            user = User.find_by(username: params[:id])
+            user = User.find_by(username: params[:username])
             if user.destroy
               render json:{message: 'User Deleted'}
             else
@@ -53,8 +53,9 @@ module Api
           if username_exist(params[:new_username])
             return render json:{message: 'Username is already exist'}
           end
-          user = User.find_by(username: params[:id])
-          if user.update({username: params[:new_username]})
+          user = User.find_by(username: params[:username])
+          user.username = params[:new_username]
+          if user.save
             render json:{message: 'User Updated Successfully'}
           else
             render json:{message: 'Failed to update user'}

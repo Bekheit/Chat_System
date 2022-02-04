@@ -85,6 +85,7 @@ services:
       SNEAKERS_THREADS: 10
       RAILS_ENV: 'development'
       WORKERS: 'CreateUserWorker'
+      ENCRYPT_KEY: '1111111111111111111111111111111111111111'
       # ELASTICSEARCH_URL: http://localhost:9200
     networks:
       - back
