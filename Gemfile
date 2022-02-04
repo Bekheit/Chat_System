@@ -32,6 +32,7 @@ gem 'rack-cors'
 gem 'jwt'
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
+gem 'elasticsearch-persistence'
 gem 'bunny'
 gem 'sneakers'
 
