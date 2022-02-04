@@ -9,16 +9,20 @@ services:
         MYSQL_PASSWORD: 12345678
     ports:
         - "3307:3306"
+    networks:
+      - back
   
-  consumer:
-    build: .
-    command: bundle exec rails runner ./app/consumers/user-consumer.rb
-    depends_on:
-      - rabbitmq
-    environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
-    hostname: 'localhost'
+  # consumer:
+  #   build: .
+  #   command: bundle exec rails runner ./app/consumers/user-consumer.rb
+  #   depends_on:
+  #     - rabbitmq
+  #     - db
+  #     - app
+  #   environment:
+  #     - RABBITMQ_DEFAULT_USER=guest
+  #     - RABBITMQ_DEFAULT_PASS=guest
+  #   hostname: 'localhost'
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -28,9 +32,27 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
-    hostname: 'localhost'
+    networks:
+      - back
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.3
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=es-docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - cluster.initial_master_nodes=elasticsearch
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+    networks:
+      - back
 
+  
 
   app:
     build: .
@@ -40,20 +62,34 @@ services:
     ports:
       - "3001:3000"
     depends_on:
-      - db
       - rabbitmq
+      - elasticsearch
+      - db
     links:
-      - db
       - rabbitmq
+      - elasticsearch
+      - db
     environment:
       DB_USER: root
       DB_NAME: Chat_System_development
       DB_PASSWORD: 12345678
       DB_HOST: db
       TokenSecret: 123456
-      BUNNY_AMQP_ADDRESSES: 'localhost:5672'
+      BUNNY_AMQP_ADDRESSES: 'rabbitmq:5672'
       BUNNY_AMQP_USER: 'guest'
       BUNNY_AMQP_PASSWORD: 'guest'
+      BUNNY_AMQP_VHOST: '/'
+      BUNNY_AMQP_EXCHANGE: 'sneakers'
+      SNEAKERS_WORKER: 1
+      SNEAKERS_PREFETCH: 10
+      SNEAKERS_THREADS: 10
+      RAILS_ENV: 'development'
+      WORKERS: 'CreateUserWorker'
+      # ELASTICSEARCH_URL: http://localhost:9200
+    networks:
+      - back
 
-  
+networks:
+  back:
+        driver: bridge
       

@@ -1,7 +1,7 @@
 class Message < ApplicationRecord
     
-    # include Elasticsearch::Model
-    # include Elasticsearch::Model::Callbacks
+    include Elasticsearch::Model
+    include Elasticsearch::Model::Callbacks
     has_one :chat
 
     # settings analysis: {

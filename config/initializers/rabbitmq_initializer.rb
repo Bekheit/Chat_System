@@ -1,21 +1,19 @@
 class RabbitQueueService
-  def self.logger
-    Rails.logger.tagged('bunny') do
-      @@_logger ||= Rails.logger
-    end
-  end
-
+  
   def self.connection
     @@_connection ||= begin
-      instance = Bunny.new('amqp://guest:guest@rabbitmq:5672')
-      
-      
-
+      instance = Bunny.new(
+        addresses: ENV['BUNNY_AMQP_ADDRESSES'],
+        username:  ENV['BUNNY_AMQP_USER'],
+        password:  ENV['BUNNY_AMQP_PASSWORD'],
+        vhost:     ENV['BUNNY_AMQP_VHOST'],
+      )
+      p '-------------------------------------'
+      p instance
+      p '-------------------------------------'
       instance.start
       instance
     end
   end
 
-  
-  # ObjectSpace.define_finalizer(RailsMessageQueue::Application, proc { puts "Closing rabbitmq connections"; RabbitQueueService.connection&.close })
 end

@@ -1,19 +1,16 @@
 module Api
   class ChatsController < ApplicationController
     before_action :app_authorized
+    $application
       
     def index
-      if application_decoded_token
-        application = Application.find_by(name: application_decoded_token[0]['name'])
-        chats = Chat.where(application_id: application.id)
-        p chats
+      p '---------------------------------chats index---------------------------------'
+        chats = Chat.where(application_id: $application.id)
         chats = chats.map {|chat| chat.attributes.except('id')}
         render json:{chats: chats}
-      end
     end
 
     def show
-      if application_decoded_token
         application = Application.find_by(name: application_decoded_token[0]['name'])
         chat = chat.find_by(number: params[:chat_no], application_id: application.id)
         if chat
@@ -21,7 +18,6 @@ module Api
         elsif 
           render json:{message: 'chat not found'}
         end
-      end
     end
 
     def create
@@ -39,7 +35,6 @@ module Api
     end
 
     def destroy
-      if application_decoded_token
         application = Application.find_by(name: application_decoded_token[0]['name'])
         chat = chat.find_by(number: params[:chat_no], application_id: application.id)
         if chat.destroy
@@ -48,30 +43,29 @@ module Api
         elsif 
           render json:{message: 'Failed to delete chat'}
         end
-      end
     end
 
     def update
-      if application_decoded_token
         application = Application.find_by(name: application_decoded_token[0]['name'])
         chat = chat.find_by(number: params[:chat_no], application_id: application.id)
-      end
     end
 
     def application_decoded_token
         token = params[:app_token]
         token = token.gsub("-", ".")
         begin
-            JWT.decode(token, 'yourSecret', true, algorithm: 'HS256')
-          rescue JWT::DecodeError
-            nil
+          p token
+          JWT.decode(token, ENV["TokenSecret"], true, algorithm: 'HS256')
+        rescue JWT::DecodeError
+          p '------------------------------------ Decode app Token error ------------------------------------'
+          nil
         end
     end
 
     def app_authorized
-      if decoded_token
+      if application_decoded_token
         application_name = application_decoded_token[0]['name']
-        application = Application.find_by(name: application_name)
+        $application = Application.find_by(name: application_name)
       end
     end
     

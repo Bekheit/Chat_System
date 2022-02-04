@@ -11,6 +11,14 @@ module Api
       end
     end
 
+    def contain
+      application = Application.find_by(name: application_decoded_token[0]['name'])
+      chat = Chat.find_by(number: params[:chat_no], application_id: application.id)
+      messages = Message.search(params[:message])
+      # messages = messages.map {|message| message.attributes.except('_id', 'sender_id', 'receiver_id', 'chat_id')}
+      render json:{messages: messages}
+    end
+
     def show
       if application_decoded_token
           application = Application.find_by(name: application_decoded_token[0]['name'])
@@ -74,7 +82,7 @@ module Api
         token = params[:app_token]
         token = token.gsub("-", ".")
         begin
-            JWT.decode(token, 'yourSecret', true, algorithm: 'HS256')
+            JWT.decode(token, ENV["TokenSecret"], true, algorithm: 'HS256')
           rescue JWT::DecodeError
             nil
         end
