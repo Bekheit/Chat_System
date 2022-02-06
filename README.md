@@ -1,4 +1,4 @@
-# Execute these commands to start the application
+## Execute these commands to start the application
 
 1. docker-compose build
 2. docker-compose run app bundle exec rake db:migrate (if fail execute it again)
@@ -19,9 +19,15 @@
    exit
    ```
 
-# Open another terminal at root path and execute these commands
+## Open another terminal at root path and execute these commands
 
 1. docker-compose run app rake elastic_search:index_models
 2. docker-compose run app rake sneakers:run
 
-### Postman man Collection [link](https://www.postman.com/Bekheit/workspace/instatask)
+## Postman man Collection [link](https://www.postman.com/Bekheit/workspace/instatask)
+
+#### Add these global variables
+
+1. URL : set it to http://localhost:3001
+2. token: it is user token and it will set when user login
+3. app-token: it is application token and it will set when get the application
