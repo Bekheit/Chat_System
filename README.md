@@ -3,7 +3,8 @@
 1. docker-compose build
 2. docker-compose run app bundle exec rake db:migrate (if fail execute it again)
 3. docker-compose up
-   if this error appears
+
+   - if this error appears
 
    ```
    elasticsearch_1  | ERROR: [1] bootstrap checks failed. You must address the points described in the following [1] lines before starting Elasticsearch.
