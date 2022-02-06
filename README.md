@@ -1,7 +1,7 @@
 ## Execute these commands to start the application
 
 1. docker-compose build
-2. docker-compose run app bundle exec rake db:migrate (if fail execute it again)
+2. docker-compose run app bundle exec rake db:migrate (if fail execute it again it will work)
 3. docker-compose up
 
    - if this error appears
@@ -26,8 +26,14 @@
 
 ## Postman man Collection [link](https://www.postman.com/Bekheit/workspace/instatask)
 
+#### Use desktop postman to be able to use the workspace
+
 #### Add these global variables
 
 1. URL : set it to http://localhost:3001
 2. token: it is user token and it will set when user login
 3. app-token: it is application token and it will set when get the application
+
+## Note
+
+- RabbitMQ Logic is applied on user create only
